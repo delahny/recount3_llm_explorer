@@ -5,7 +5,14 @@ Shared utilities.
 
 import json
 import ollama
-from src.config import MODEL
+
+_ACTIVE_MODEL = None
+
+def set_llm_model(model: str) -> None:
+    """Set the active model used by call_llm."""
+    global _ACTIVE_MODEL
+    if model:
+        _ACTIVE_MODEL = model
 
 def parse_json_response(response_text: str) -> dict:
     """Extract JSON from LLM response."""
@@ -20,11 +27,16 @@ def parse_json_response(response_text: str) -> dict:
             return {}
     return {}
 
-def call_llm(prompt: str, temperature: float = 0) -> str:
+def call_llm(prompt: str, temperature: float = 0, model: str = None) -> str:
     """Call the LLM and return response text."""
+    selected_model = model or _ACTIVE_MODEL
+    if not selected_model:
+        print("LLM error: no model selected. Set model via set_llm_model() or pass model=...")
+        return ""
+
     try:
         response = ollama.chat(
-            model=MODEL,
+            model=selected_model,
             messages=[{'role': 'user', 'content': prompt}],
             options={'temperature': temperature}
         )

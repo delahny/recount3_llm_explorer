@@ -5,16 +5,65 @@ Database Search Assistant - Chat Page
 
 import streamlit as st
 import pandas as pd
+import ollama 
 from src.config import indexed_data, df_csv
 from src.intent import detect_intent, check_ambiguity, handle_clarification
 from src.search import search_data
 from src.analyze import analyze
 from src.parser import parse_search_query
 from src.query_standardizer import standardize_search
+from src.utils import set_llm_model
 
 # Page Setup
 st.set_page_config(page_title="Chat | Database Search Assistant", page_icon="💬", layout="wide")
 st.header("What do you want to find? 💬")
+
+# Helper function to discover local ollama models
+def discover_local_ollama_models():
+    """
+    Return a sorted list of model identifiers from ollama.list(),
+    e.g. ['gemma3:4b', 'gemma3:1b', 'granite4:latest', ...]
+    """
+    try:
+        models = ollama.list()["models"]  # returns a list of Model(...) objects
+    except Exception as e:
+        # Ollama client not available / Ollama not running
+        # Return empty list so UI can show an error and avoid crash
+        return []
+
+    names = []
+    for m in models:
+        # each m has attribute `model` per your printed output
+        try:
+            names.append(m.model)
+        except Exception:
+            # defensive: if structure differs, try string conversion and parse
+            s = str(m)
+            # a safe fallback: try to extract token before first space or comma
+            token = s.split()[0].strip(",")
+            if token:
+                names.append(token)
+
+    # de-duplicate and sort for stable UI behaviour
+    return sorted(dict.fromkeys(names))
+
+# LLM settings (kept minimal)
+# call once at startup
+available_models = discover_local_ollama_models()
+
+# show a helpful sidebar message if empty
+if not available_models:
+    st.error(
+        "No local Ollama models discovered. Make sure Ollama is installed and running, "
+        "and that the Python `ollama` package can reach it."
+    )
+    st.stop()
+
+# model selection as a dropdown in the sidebar
+model = st.selectbox("Model (Qwen2.5:7b Recommended)", options=available_models, index=0)
+set_llm_model(model)
+
+
 st.caption(f"Searching through {len(indexed_data)} gene expression studies")
 
 # Chat state
