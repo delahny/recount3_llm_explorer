@@ -37,6 +37,8 @@ pandas
 ollama
 requests
 ```
+**Note** You will also need Ollama running with at least one local model installed. 
+You will be able to choose from your local models.
 
 Install dependencies:
 ```bash
