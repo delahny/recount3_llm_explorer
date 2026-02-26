@@ -1,6 +1,7 @@
 # recount3_llm_explorer
-**A Streamlit web application for searching and analyzing gene expression studies**
-This app uses datasets from the [recount3 database](https://rna.recount.bio/)
+**A Streamlit web application for searching and analyzing gene expression studies.**
+
+This app uses datasets from the [recount3 database](https://rna.recount.bio/).
 
 ## Features
 - **Chat Interface** — Ask questions in plain English to search or analyze studies
