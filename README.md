@@ -38,7 +38,7 @@ pandas
 ollama
 requests
 ```
-**Note** You will also need Ollama running with at least one local model downloaded. 
+**Note:** You will need Ollama running with at least one local model downloaded. 
 You will be able to choose from your local models.
 
 **Install dependencies:**
